@@ -37,6 +37,8 @@ Response
         
 ## Build & Run
 
-sbt build
-sbt run
+Navigate to project folder 
+
+    sbt build
+    sbt run
 
