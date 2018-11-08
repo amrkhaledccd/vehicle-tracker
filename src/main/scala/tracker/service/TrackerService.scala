@@ -5,18 +5,16 @@ import java.time.LocalTime
 import com.typesafe.scalalogging.LazyLogging
 import tracker.model.{Coordinate, StopTime, Vehicle}
 
-import scala.util.Try
-
 /*
   Main functionalities that are exposed through the endpoint
  */
 trait TrackerOperations {
 
-  def findVehicleByTimeAndCoordinate(time: LocalTime, coordinate: Coordinate): Try[Option[Vehicle]]
+  def findVehicleByTimeAndCoordinate(time: LocalTime, coordinate: Coordinate): Option[Vehicle]
 
-  def findNextVehicle(stopId: Long): Try[Option[Vehicle]]
+  def findNextVehicle(stopId: Long): Option[Vehicle]
 
-  def isLineDelayed(lineId: Long): Try[Boolean]
+  def isLineDelayed(lineId: Long): Boolean
 }
 
 /*
@@ -41,31 +39,25 @@ class TrackerService(lineVehicles: Map[Long, List[Vehicle]],
      3. find the vehicle for this stop time
    */
   override def findVehicleByTimeAndCoordinate(time: LocalTime,
-                                              coordinate: Coordinate): Try[Option[Vehicle]] = {
+                                              coordinate: Coordinate): Option[Vehicle] = {
 
-    val stopId = stopService.findByCoordinate(coordinate) match {
-      case Some(sId) => sId.id
-      case None => throw new RuntimeException(s"Stop not found for coordinate $coordinate")
-    }
-
-    Try(
-        for {
-          stopTime <- findStopTime(stopId, time, (time1, time2) => time1.equals(time2));
+      for {
+          stop <- stopService.findByCoordinate(coordinate)
+          stopTime <- findStopTime(stop.id, time, (time1, time2) => time1.equals(time2));
           vehicle <- findVehicle(stopTime)
         } yield vehicle
-      )
+
   }
 
   /*
     Finds first vehicle will arrive next to the specified stop
    */
-  override def findNextVehicle(stopId: Long): Try[Option[Vehicle]] = {
-    Try (
+  override def findNextVehicle(stopId: Long): Option[Vehicle] = {
+
       for {
         stopTime <- findStopTime(stopId, LocalTime.now(), (time1, time2) => time1.compareTo(time2) >= 0);
         vehicle <- findVehicle(stopTime)
       } yield vehicle
-    )
   }
 
   /*
@@ -75,9 +67,9 @@ class TrackerService(lineVehicles: Map[Long, List[Vehicle]],
 
     for the given data sample all lines are delayed
    */
-  override def isLineDelayed(lineId: Long): Try[Boolean] = Try (
+  override def isLineDelayed(lineId: Long): Boolean =
     delayService.findByLineName(findLineName(lineId)) > 0
-  )
+
 
   /*
      Finds stopTime that its time + delay equal or greater and equal (based on compare function)

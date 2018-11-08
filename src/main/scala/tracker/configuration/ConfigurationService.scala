@@ -12,5 +12,5 @@ class ConfigurationService(configuration: Config) {
   lazy val tracker = configuration.as[Tracker]("tracker")
 }
 
-case class Server (port: Int)
+case class Server (port: Int, interface: String)
 case class Tracker (delays: String, lines: String, stops: String, times: String)

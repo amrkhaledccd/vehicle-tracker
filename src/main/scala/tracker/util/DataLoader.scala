@@ -1,18 +1,20 @@
 package tracker.util
 
+import com.typesafe.scalalogging.LazyLogging
 import tracker.configuration.Tracker
 import tracker.mapper.{GenericMapper, TrackerMapper}
 import tracker.model._
 import tracker.service.{LineService, StopTimeService}
 
 import scala.collection.mutable
+import scala.util.{Failure, Success}
 
 object DataLoader {
 
   def apply(trackerConfig: Tracker): DataLoader = new DataLoader(trackerConfig)
 }
 
-class DataLoader(trackerConfig: Tracker) {
+class DataLoader(trackerConfig: Tracker) extends LazyLogging{
 
   def loadDelays: Map[String, Delay] = {
 
@@ -21,8 +23,11 @@ class DataLoader(trackerConfig: Tracker) {
     TrackerFileReader
       .readLinesFromResource(trackerConfig.delays)
       .drop(1)
-      .map(GenericMapper.map[Delay](_, TrackerMapper.mapDelay))
-      .foreach(delay => mutableMap.put(delay.lineName, delay))
+      .foreach ( delayLine =>
+        GenericMapper.map[Delay](delayLine, TrackerMapper.mapDelay) match {
+          case Success(delay) => mutableMap.put(delay.lineName, delay)
+          case Failure(exception) => logger.error(s"Error mapping delay line $delayLine ", exception)
+        })
 
     mutableMap.toMap
   }
@@ -34,8 +39,11 @@ class DataLoader(trackerConfig: Tracker) {
     TrackerFileReader
       .readLinesFromResource(trackerConfig.lines)
       .drop(1)
-      .map(GenericMapper.map[Line](_, TrackerMapper.mapLine))
-      .foreach(line => mutableMap.put(line.id, line))
+      .foreach(lineLine =>
+        GenericMapper.map[Line](lineLine, TrackerMapper.mapLine) match {
+          case Success(line) => mutableMap.put(line.id, line)
+          case Failure(exception) => logger.error(s"Error mapping line $lineLine ", exception)
+        })
 
     mutableMap.toMap
   }
@@ -47,8 +55,12 @@ class DataLoader(trackerConfig: Tracker) {
     TrackerFileReader
       .readLinesFromResource(trackerConfig.stops)
       .drop(1)
-      .map(GenericMapper.map[Stop](_, TrackerMapper.mapStop))
-      .foreach(stop => mutableMap.put(stop.coordinate, stop))
+      .foreach (stopLine =>
+        GenericMapper.map[Stop](stopLine, TrackerMapper.mapStop) match {
+          case Success(stop) => mutableMap.put(stop.coordinate, stop)
+          case Failure(exception) => logger.error(s"Error mapping stop line $stopLine ", exception)
+
+        })
 
     mutableMap.toMap
   }
@@ -60,12 +72,16 @@ class DataLoader(trackerConfig: Tracker) {
     TrackerFileReader
       .readLinesFromResource(trackerConfig.times)
       .drop(1)
-      .map(GenericMapper.map[StopTime](_, TrackerMapper.mapTime))
-      .foreach(time => mutableMap.get(time.stopId) match {
-          case Some(times) => mutableMap.put(time.stopId, times :+ time)
-          case None => mutableMap.put(time.stopId, List(time))
-        }
-      )
+      .foreach (stopTimeLine =>
+        GenericMapper.map[StopTime](stopTimeLine, TrackerMapper.mapTime) match {
+
+          case Success(stopTime) => mutableMap.get(stopTime.stopId) match {
+                      case Some(times) => mutableMap.put(stopTime.stopId, times :+ stopTime)
+                      case None => mutableMap.put(stopTime.stopId, List(stopTime))
+                    }
+          case Failure(exception) => logger.error(s"Error mapping stopTime line $stopTimeLine ", exception)
+
+        })
 
     mutableMap.toMap
   }

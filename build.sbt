@@ -30,8 +30,13 @@ val testDependencies = Seq(
   "com.typesafe.akka" %% "akka-http-testkit" % "10.0.9"
 ).map (_ % "test")
 
+val jsonDependencies = Seq(
+  "io.spray" %%  "spray-json" % "1.3.2"
+)
+
 libraryDependencies ++=
     httpDependencies ++ 
       loggingDependencies ++
       configurationDependencies ++
-      testDependencies
+      testDependencies ++
+      jsonDependencies
