@@ -41,10 +41,9 @@ class TrackerService(lineVehicles: Map[Long, List[Vehicle]],
      3. find the vehicle for this stop time
    */
   override def findVehicleByTimeAndCoordinate(time: LocalTime,
-                                              coordinate: Coordinate): Try[Option[Vehicle]] =
-  {
+                                              coordinate: Coordinate): Try[Option[Vehicle]] = {
 
-    val stopId = stopService.findByByCoordinate(coordinate) match {
+    val stopId = stopService.findByCoordinate(coordinate) match {
       case Some(sId) => sId.id
       case None => throw new RuntimeException(s"Stop not found for coordinate $coordinate")
     }

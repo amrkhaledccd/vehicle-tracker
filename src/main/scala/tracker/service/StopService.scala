@@ -6,7 +6,7 @@ import tracker.model.{Coordinate, Stop}
 
 trait StopOperations {
   def findByStopId(stopId: Long): Option[Stop]
-  def findByByCoordinate(coordinate: Coordinate): Option[Stop]
+  def findByCoordinate(coordinate: Coordinate): Option[Stop]
 }
 
 object StopService {
@@ -22,6 +22,6 @@ class StopService(stopMap: Map[Coordinate, Stop]) extends StopOperations
   override def findByStopId(stopId: Long): Option[Stop] =
     stopMap.values.find(_.id == stopId)
 
-  override def findByByCoordinate(coordinate: Coordinate): Option[Stop] =
+  override def findByCoordinate(coordinate: Coordinate): Option[Stop] =
     stopMap.get(coordinate)
 }

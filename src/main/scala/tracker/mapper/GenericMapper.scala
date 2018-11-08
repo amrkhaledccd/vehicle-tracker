@@ -20,11 +20,11 @@ object TrackerMapper {
 
   val timeFormatter = DateTimeFormatter.ISO_TIME
 
-  def mapDelay(arr: Array[String]): Delay = Delay(arr(0), arr(1).toInt)
+  def mapDelay(arr: Array[String]) = Delay(arr(0), arr(1).toInt)
 
-  def mapLine(arr: Array[String]): Line = Line(arr(0).toInt, arr(1))
+  def mapLine(arr: Array[String]) = Line(arr(0).toInt, arr(1))
 
-  def mapStop(arr: Array[String]): Stop = Stop(arr(0).toInt, Coordinate(arr(1).toInt, arr(2).toInt))
+  def mapStop(arr: Array[String]) = Stop(arr(0).toInt, Coordinate(arr(1).toInt, arr(2).toInt))
 
-  def mapTime(arr: Array[String]): StopTime = StopTime(arr(0).toInt, arr(1).toInt,  LocalTime.parse(arr(2), timeFormatter))
+  def mapTime(arr: Array[String]) = StopTime(arr(0).toInt, arr(1).toInt,  LocalTime.parse(arr(2), timeFormatter))
 }

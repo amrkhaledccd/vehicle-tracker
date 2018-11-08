@@ -85,7 +85,7 @@ class DataLoader(trackerConfig: Tracker) {
       val stopTimes = stopTimeService.findByLineId(line.id)
       val vehicle = Vehicle(vehicleId, stopTimes, line)
 
-      vehicleId+=1
+      vehicleId += 1
       mutableMap.put(line.id, List(vehicle))
     }
 
