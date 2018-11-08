@@ -32,10 +32,9 @@ The assumptions are mentioned in code comments
  
         true
         
-## Build & Run
+## Run
 
 Navigate to project folder 
 
-    sbt build
     sbt run
 
