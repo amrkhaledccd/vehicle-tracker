@@ -17,7 +17,7 @@ object DelayService {
 }
 
 /*
-  for fast access it holds a map [LineId, Delay]
+  for fast access it holds a map [LineName, Delay]
  */
 class DelayService(lineDelays: Map[String, Delay]) extends DelayOperations
     with LazyLogging {
