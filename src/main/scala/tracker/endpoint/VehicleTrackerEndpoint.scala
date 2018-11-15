@@ -42,12 +42,12 @@ class VehicleTrackerEndpoint(trackerService: TrackerService)
 
         trackerService.findVehicleByTimeAndCoordinate(lTime, Coordinate(x, y)) match {
           case Some(vehicle) => completeWithVehicleResponse(vehicle)
-          case None => completeWithStatus(StatusCodes.NoContent)
+          case None => completeWithStatus(StatusCodes.NoContent, "No Vehicle found")
         }
       }
       case Failure(exception) => {
         logger.error("Error parsing time ", exception)
-        completeWithStatus(StatusCodes.BadRequest)
+        completeWithStatus(StatusCodes.BadRequest, s"Couldn't parse time $time")
       }
     }
   }
@@ -56,7 +56,7 @@ class VehicleTrackerEndpoint(trackerService: TrackerService)
 
     trackerService.findNextVehicle(stopId) match  {
       case Some(vehicle) => completeWithVehicleResponse(vehicle)
-      case None => completeWithStatus(StatusCodes.NoContent)
+      case None => completeWithStatus(StatusCodes.NoContent, "No Vehicle found")
     }
   }
 
